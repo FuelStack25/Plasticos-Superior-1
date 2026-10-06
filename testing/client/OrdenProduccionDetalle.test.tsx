@@ -25,7 +25,6 @@ vi.mock("../../client/src/api/client", async () => {
       reopenProductionOrder: vi.fn().mockResolvedValue({}),
       releaseProductionOrder: vi.fn().mockResolvedValue({}),
       deriveProductionOrder: vi.fn().mockResolvedValue({}),
-      getProductionRollLabel: vi.fn().mockResolvedValue({}),
       downloadProductionOrderPdf: vi.fn(),
       downloadProductionOrderAttachment: vi.fn(),
       uploadProductionOrderAttachment: vi.fn().mockResolvedValue({}),

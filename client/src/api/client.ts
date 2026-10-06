@@ -484,8 +484,6 @@ export const api = {
   ) => request<any>(`/production-orders/${productionOrderId}/rolls`, { method: "POST", body: JSON.stringify(data) }),
   deleteProductionRoll: (productionOrderId: number, rollId: number) =>
     request<void>(`/production-orders/${productionOrderId}/rolls/${rollId}`, { method: "DELETE" }),
-  getProductionRollLabel: (productionOrderId: number, rollId: number) =>
-    request<any>(`/production-orders/${productionOrderId}/rolls/${rollId}/label`),
   /** Genera un token de posesión NUEVO para un rollo ya creado e imprime su
    * QR con el código+token embebido — invalida cualquier etiqueta anterior
    * (su token viejo deja de servir). Para etiquetas dañadas/perdidas. */

@@ -265,9 +265,9 @@ productionOrdersRouter.get("/reports/por-operario", requireProduccionGestion, as
 });
 
 /**
- * Resuelve un rollo por el código de su etiqueta QR (`<prefijo>-<n>`, ver
- * GET /:id/rolls/:rollId/label). La usa el escáner al cargar un rollo en la
- * OP derivada: quien escanea confirma qué rollo físico tomó como insumo.
+ * Resuelve un rollo por el código de su etiqueta QR (`<prefijo>-<n>`). La usa
+ * el escáner al cargar un rollo en la OP derivada: quien escanea confirma qué
+ * rollo físico tomó como insumo.
  */
 productionOrdersRouter.get("/rolls/by-code/:code", async (req, res) => {
   const match = ROLL_CODE_RE.exec(req.params.code);
@@ -2364,41 +2364,6 @@ productionOrdersRouter.delete("/:id/attachments/:attachmentId", requireProduccio
   await prisma.productionOrderAttachment.delete({ where: { id: attachmentId } });
   fs.unlink(path.join(UPLOADS_DIR, attachment.storedName), () => {});
   res.status(204).end();
-});
-
-/**
- * Etiqueta térmica imprimible de un rollo: QR con SOLO el código
- * `<prefijo>-<n>` (EXT/IMP/SELL/PRE), sin el token de posesión -- ese token
- * nunca se guarda en texto plano (ver services/rollPossessionToken.ts), así
- * que no hay forma de reconstruirlo después de la creación. Este QR sirve
- * para identificar el rollo (ej. Trazabilidad), pero NO demuestra posesión
- * física: no sirve para escanearlo como insumo (eso siempre exige el
- * token). Para una etiqueta que sí lo incluya, ver
- * POST /:id/rolls/:rollId/reissue-label.
- */
-productionOrdersRouter.get("/:id/rolls/:rollId/label", async (req, res) => {
-  const productionOrderId = Number(req.params.id);
-  const rollId = Number(req.params.rollId);
-  if (!Number.isInteger(productionOrderId) || !Number.isInteger(rollId)) {
-    return res.status(400).json({ error: "Id inválido" });
-  }
-
-  const roll = await prisma.productionRoll.findFirst({
-    where: { id: rollId, productionOrderId },
-    include: { productionOrder: { select: { orderNumber: true, station: true, product: { select: { name: true } } } } },
-  });
-  if (!roll) return res.status(404).json({ error: "Rollo no encontrado" });
-
-  const code = sourceRollCode(roll);
-  const qrDataUrl = await QRCode.toDataURL(code);
-  res.json({
-    code,
-    label: roll.label,
-    weightKg: roll.weightKg,
-    orderNumber: roll.productionOrder.orderNumber,
-    productName: roll.productionOrder.product.name,
-    qrDataUrl,
-  });
 });
 
 /**

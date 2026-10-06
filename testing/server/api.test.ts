@@ -1247,21 +1247,15 @@ describe("órdenes de producción · una OP por proceso (derivación, rollos, ca
     });
     const roll = (await rollRes.json()) as { id: number; stationSequence: number };
 
-    const label = await fetch(`${baseUrl}/api/production-orders/${extOrder.id}/rolls/${roll.id}/label`, {
+    const code = `EXT-${roll.stationSequence}`;
+    const byCode = await fetch(`${baseUrl}/api/production-orders/rolls/by-code/${code}`, {
       headers: headersFor("operario_extrusion"),
     });
-    assert.equal(label.status, 200);
-    const labelBody = (await label.json()) as { code: string };
     assert.equal(
-      labelBody.code,
-      `EXT-${roll.stationSequence}`,
-      "un rollo de Extrusión lleva el prefijo EXT (no el genérico RL) y el número es la numeración PROPIA de Extrusión, no el id global"
+      byCode.status,
+      200,
+      "un rollo de Extrusión se resuelve por el prefijo EXT (no el genérico RL) usando la numeración PROPIA de Extrusión, no el id global"
     );
-
-    const byCode = await fetch(`${baseUrl}/api/production-orders/rolls/by-code/${labelBody.code}`, {
-      headers: headersFor("operario_extrusion"),
-    });
-    assert.equal(byCode.status, 200, "el código con el nuevo prefijo debe resolver el rollo");
 
     // Etiquetas físicas ya impresas ANTES de tener prefijo por estación
     // (formato "RL-<id global>") siguen circulando en planta -- tienen que

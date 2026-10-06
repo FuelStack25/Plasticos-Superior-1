@@ -1037,16 +1037,6 @@ export default function OrdenProduccionDetalle() {
     setPendingRolls(remainingRows);
   }
 
-  async function handlePrintLabel(rollId: number) {
-    setError(null);
-    try {
-      const label = await api.getProductionRollLabel(orderId, rollId);
-      printRollLabel(label);
-    } catch {
-      setError("No se pudo generar la etiqueta");
-    }
-  }
-
   /** Genera un token de posesión NUEVO para un rollo ya guardado e imprime
    * su QR -- para cuando la etiqueta original (la que se pudo imprimir una
    * sola vez, justo al confirmarlo) nunca se imprimió, se dañó o se
@@ -2161,13 +2151,10 @@ export default function OrdenProduccionDetalle() {
                   ))}
                   {canOperate && (
                     <td className={`${cellBorder} px-1.5 py-1 text-center whitespace-nowrap`}>
-                      <button type="button" className="text-slate-500 dark:text-slate-400" title="Imprimir etiqueta" onClick={() => handlePrintLabel(roll.id)}>
-                        <Printer size={13} aria-hidden="true" />
-                      </button>
                       {canGestion && (
                         <button
                           type="button"
-                          className="text-slate-500 dark:text-slate-400 ml-1.5"
+                          className="text-slate-500 dark:text-slate-400"
                           title="Reemitir etiqueta (invalida la anterior)"
                           onClick={() => handleReissueLabel(roll.id, `${ROLL_CODE_PREFIX[station]}-${roll.stationSequence}`)}
                         >
@@ -2310,9 +2297,6 @@ export default function OrdenProduccionDetalle() {
                 ))}
                 {canOperate && (
                   <div className="flex items-center justify-end gap-3 px-3 py-1.5">
-                    <button type="button" className="text-slate-500 dark:text-slate-400" title="Imprimir etiqueta" onClick={() => handlePrintLabel(roll.id)}>
-                      <Printer size={15} aria-hidden="true" />
-                    </button>
                     {canGestion && (
                       <button
                         type="button"
